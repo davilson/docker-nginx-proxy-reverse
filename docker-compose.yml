@@ -1,0 +1,55 @@
+version: '3'
+services:
+  # configuração proxy nginx
+  reverse-proxy-service:
+    container_name: reverse-proxy-service
+    restart: always
+    image: nginx
+    depends_on:
+      - node-app-1-service
+      - node-app-2-service
+      - node-app-3-service
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+      - ./config/servers.conf:/etc/nginx/conf.d/servers.conf
+    ports:
+      - 80:80
+      - 443:443
+  
+  # configuração certbot
+  # certbot-service:
+  #   image: certbot/certbot:latest
+  #   command: certonly --webroot --webroot-path=/var/www/certbot --email davilsondecastro@gmail.com --agree-tos --no-eff-email -d davilson.local
+  #   volumes:
+  #     - ./certbot/conf:/etc/letsencrypt
+  #     - ./certbot/logs:/var/log/letsencrypt
+  #     - ./certbot/data:/var/www/certbot
+  #   depends_on:
+  #     - reverse-proxy-service
+      
+  # configuração app 1
+  node-app-1-service:
+    container_name: node-app-1-service
+    restart: always
+    build: ./src/app1
+    command: npm start
+    ports:
+      - 3001:3001
+
+  # configuração app 2
+  node-app-2-service:
+    container_name: node-app-2-service
+    restart: always
+    build: ./src/app2
+    command: npm start
+    ports:
+      - 3002:3002
+
+  # configuração app 3
+  node-app-3-service:
+    container_name: node-app-3-service
+    restart: always
+    build: ./src/app3
+    command: npm start
+    ports:
+      - 3003:3003
